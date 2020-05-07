@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutterbasics/config/config.dart';
 import 'package:flutterbasics/enum/enum.dart';
+import 'package:flutterbasics/page/widget/features/ConciseHeader.dart';
 import 'package:oktoast/oktoast.dart';
 import 'MapUtils.dart';
 class NavigationPage extends StatefulWidget{
@@ -27,15 +28,7 @@ class _NavigationPage extends State<NavigationPage>{
     return Scaffold(
       body: Column(
         children: <Widget>[
-          Container(
-            padding: EdgeInsets.fromLTRB(0, Config.getStatusHeight(), 0, 0),
-            color: Color(0XFF00CCA9),
-            child: Container(
-              height: 54,
-              alignment: Alignment.center,
-              child: Text("导航样例",style: TextStyle(color: Colors.white,fontSize: 16),),
-            ),
-          ),
+          ConciseHeader('导航样例'),
           Container(
             child: Wrap(
               children: <Widget>[

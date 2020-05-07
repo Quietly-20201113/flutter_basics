@@ -1,7 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterbasics/config/config.dart';
+import 'package:flutterbasics/page/customize_navigator/index.dart';
 import 'package:flutterbasics/page/navigation/navigationPage.dart';
+
+import 'dropdown/DropDownPage.dart';
 // ignore: must_be_immutable
 class PageIndex extends StatelessWidget{
   Alignment alignment = Alignment.center;
@@ -31,25 +34,46 @@ class PageIndex extends StatelessWidget{
                 ),
               ),
               SizedBox(height: 8,),
-              Container(
-                child: GestureDetector(
-                  child: Container(
-                    alignment:alignment,
-                    height: height,
-                    decoration: decoration,
-                    child:Text("导航功能",style: TextStyle(color: Color(0XFF909399),fontSize: 16),),
-                  ) ,
-                  onTap: (){
-                    Navigator.push(
-                      context,
-                      new MaterialPageRoute(builder: (context) =>  NavigationPage()),
-                    );
-                  },
-                ),
-              )
+              _Container("导航功能",(){
+                Navigator.push(
+                  context,
+                  new MaterialPageRoute(builder: (context) =>  NavigationPage()),
+                );
+              }),
+              SizedBox(height: 8,),
+              _Container("复杂的搜索功能",(){
+                Navigator.push(
+                  context,
+                  new MaterialPageRoute(builder: (context) =>  DropDownPage()),
+                );
+              }),
+              SizedBox(height: 8,),
+              _Container("自定义路由",(){
+                Navigator.push(
+                  context,
+                  new MaterialPageRoute(builder: (context) =>  CustomizeNavigator()),
+                );
+              }),
             ],
           ),
         )
+    );
+  }
+
+
+
+
+  Widget _Container(name,GestureTapCallback onTap){
+    return GestureDetector(
+      child: Container(
+        alignment:alignment,
+        height: height,
+        decoration: decoration,
+        child:Text(name,style: TextStyle(color: Color(0XFF909399),fontSize: 16),),
+      ),
+      onTap: (){
+        onTap();
+      },
     );
   }
 }
