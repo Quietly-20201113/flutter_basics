@@ -8,6 +8,9 @@ import 'package:flutterbasics/page/widget/features/ConciseHeader.dart';
 import 'package:oktoast/oktoast.dart';
 import 'MapUtils.dart';
 class NavigationPage extends StatefulWidget{
+  final ValueChanged onTap;
+
+  const NavigationPage({Key key, this.onTap}) : super(key: key);
   @override
   _NavigationPage createState() => _NavigationPage();
 }
@@ -37,6 +40,16 @@ class _NavigationPage extends State<NavigationPage>{
                 _Container('百度导航',(){Goto(MapType.BAIDUMAP,'你怕是么有装百度导航``````');}),
                 _Container('苹果导航',(){Goto(MapType.APPLEMAP,'你怕是么有装苹果导航``````');}),
               ],
+            ),
+          ),
+          GestureDetector(
+            onTap: (){
+              widget.onTap("");
+            },
+            child: Container(
+              color: Colors.blue,
+              padding: EdgeInsets.all(20),
+              child: Text("点击"),
             ),
           ),
           Expanded(
