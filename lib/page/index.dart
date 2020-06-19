@@ -1,10 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutterbasics/config/config.dart';
+import 'package:flutter/services.dart';
+import 'package:flutterbasics/common/app/app.dart';
+import 'package:flutterbasics/page/calendar_carousel/calendar_carouse_interval.dart';
 import 'package:flutterbasics/page/calendar_carousel/index.dart';
 import 'package:flutterbasics/page/customize_navigator/index.dart';
 import 'package:flutterbasics/page/navigation/navigationPage.dart';
-import 'package:flutterbasics/page/take_pictures/index.dart';
 
 import 'dropdown/DropDownPage.dart';
 // ignore: must_be_immutable
@@ -27,7 +28,7 @@ class PageIndex extends StatelessWidget{
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
               Container(
-               padding: EdgeInsets.fromLTRB(0, Config.getStatusHeight(), 0, 0),
+               padding: EdgeInsets.fromLTRB(0, App.getStatusHeight(), 0, 0),
                 color: Color(0XFF00CCA9),
                 child: Container(
                   height: 54,
@@ -39,7 +40,7 @@ class PageIndex extends StatelessWidget{
               Expanded(
                 child: Column(
                   children: <Widget>[
-                    _Container("导航功能",(){
+                    _Container("导航功能",() async {
                       Navigator.push(
                         context,
                         new MaterialPageRoute(builder: (context) =>  NavigationPage()),
@@ -60,19 +61,20 @@ class PageIndex extends StatelessWidget{
                       );
                     }),
                     SizedBox(height: 8,),
-                    _Container("拍照测试",(){
-                      Navigator.push(
-                        context,
-                        new MaterialPageRoute(builder: (context) =>  TakePictures()),
-                      );
-                    }),
-                    SizedBox(height: 8,),
-                    _Container("自定义日历",(){
+                    _Container("自定义单选日历",(){
                       Navigator.push(
                         context,
                         new MaterialPageRoute(builder: (context) =>  CalendarCarouselDP()),
                       );
                     }),
+                    SizedBox(height: 8.0,),
+                    _Container("自定义区间选日历",(){
+                      Navigator.push(
+                        context,
+                        new MaterialPageRoute(builder: (context) =>  CalendarCarouseInterval()),
+                      );
+                    }),
+
                   ],
                 ),
               ),

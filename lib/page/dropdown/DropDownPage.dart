@@ -2,6 +2,10 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyrefresh/easy_refresh.dart';
+import 'package:flutterbasics/common/app/app.dart';
+import 'package:flutterbasics/common/theme/app_theme.dart';
+import 'package:flutterbasics/page/dropdown/business/dropdown_sliver.dart';
 import 'package:flutterbasics/page/dropdown/widget/drapdown_common.dart';
 import 'package:flutterbasics/page/dropdown/widget/dropdown_header.dart';
 import 'package:flutterbasics/page/dropdown/business/dropdown_list_menu.dart';
@@ -85,6 +89,23 @@ class DropDownPage extends StatefulWidget{
 }
 
 class _DropDownPage extends State<DropDownPage>{
+
+  ScrollController scrollController;
+  GlobalKey globalKey;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    scrollController = new ScrollController();
+    globalKey = new GlobalKey();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    scrollController.dispose();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -93,8 +114,8 @@ class _DropDownPage extends State<DropDownPage>{
         children: <Widget>[
           ConciseHeader('下拉框样例'),
           Expanded(
-            child:_body()
-          )
+            child: _body(),
+          ),
         ],
       ),
     );
@@ -110,26 +131,87 @@ class _DropDownPage extends State<DropDownPage>{
   }
   Widget buildFixHeaderDropdownMenu() {
     return new DefaultDropdownMenuController(
+
       onSelected: ({int menuIndex, dynamic data}){
+
         print(
             "menuIndex:$menuIndex data:$data");
       },
-        child: new Column(
+        child: Stack(
           children: <Widget>[
-            buildDropdownHeader(),
-            new Expanded(
-                child:  Stack(
-                  children: <Widget>[
-                     ListView(
-                      children: <Widget>[new Text("123123")],
+            EasyRefresh.custom(
+                scrollController: scrollController,
+                slivers: <Widget>[
+                  SliverList(
+                      key: globalKey,
+                      delegate: new SliverChildBuilderDelegate(
+                              (BuildContext context, int index) {
+                            return new Container();
+                          }, childCount: 1)
+                  ),
+                  SliverPersistentHeader(
+                    delegate:  DropdownSliverChildBuilderDelegate(
+                        builder: (BuildContext context) {
+                          return Container(
+                            child: Column(
+                              children: <Widget>[
+                                Container(
+                                    color: Colors.white,
+                                    child: buildDropdownHeader(onTap:(index){
+                                      if(index == 1){
+                                        _openAddEntryDialog(context);
+                                      }
+                                      _onTapHead(index);
+                                    })
+                                ),
+                              ],
+                            ),
+                          );
+                        },
                     ),
-                    buildDropdownMenu()
-                  ],
-                ))
+                    pinned: true,
+                    floating: true,
+                  ),
+                  SliverList(
+                      delegate:  SliverChildBuilderDelegate(
+                              (BuildContext context, int index) {
+                            return  Container(
+                              child: Center(
+                                child: Text("別的內容"),
+                              )
+                            );
+                          }, childCount:  1)
+                  ),
+                ]),
+            Padding(
+                padding: EdgeInsets.only(top: 40),
+                child: buildDropdownMenu()
+            )
           ],
         ));
-  }
 
+  }
+  Future _openAddEntryDialog(BuildContext context) async {
+    dynamic _map = await  Navigator.of(context).push(MaterialPageRoute<dynamic>(
+        builder: (BuildContext context) {
+          return new MapAddress();
+        },
+        fullscreenDialog: true
+    ));
+    _onTapHead(1);
+    print("返回_map = $_map");
+  }
+  void _onTapHead(int index) {
+    RenderObject renderObject = globalKey.currentContext.findRenderObject();
+    DropdownMenuController controller =
+    DefaultDropdownMenuController.of(globalKey.currentContext);
+    scrollController
+        .animateTo(scrollController.offset + renderObject.semanticBounds.height,
+        duration: new Duration(milliseconds: 150), curve: Curves.ease)
+        .whenComplete(() {
+      controller.show(index);
+    });
+  }
   DropdownMenu buildDropdownMenu() {
     return new DropdownMenu(maxMenuHeight: kDropdownMenuItemHeight * 10,
         menus: [
@@ -144,13 +226,10 @@ class _DropDownPage extends State<DropDownPage>{
               height: kDropdownMenuItemHeight * TYPES.length),
           new DropdownMenuBuilder(
               builder: (BuildContext context) {
-                return new DropdownListMenu(
-                  selectedIndex: ORDER_INDEX,
-                  data: ORDERS,
-                  itemBuilder: buildCheckItem,
-                );
+                 return Container();
               },
-              height: kDropdownMenuItemHeight * ORDERS.length),
+              height: 0
+          ),
           new DropdownMenuBuilder(
               builder: (BuildContext context) {
                 return new DropdownTreeMenu(
@@ -225,4 +304,147 @@ class _DropDownPage extends State<DropDownPage>{
               height: 450.0)
         ]);
   }
+}
+
+
+
+
+typedef Widget MapItemBuilder(
+    BuildContext context, Map data, bool selected);
+
+class MapAddress extends StatefulWidget{
+  @override
+  _MapAddress createState() => _MapAddress();
+
+}
+
+
+class _MapAddress extends State<MapAddress> {
+
+  List<Map> _dataList = [];
+
+  int _selectIndex = -1;
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    return Scaffold(
+      backgroundColor: AppTheme.rcColor.primaryF5F5F5,
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: <Widget>[
+          Container(
+            padding: EdgeInsets.fromLTRB(0, App.getStatusHeight(), 0, 0),
+            color: AppTheme.rcColor.primaryF5F5F5,
+            child: Container(
+              height: 44,
+              alignment: Alignment.center,
+              child: Stack(
+                children: <Widget>[
+                  Container(
+                    alignment: Alignment.center,
+                    child: Text(
+                      '地点微调',
+                      style: TextStyle(
+                          color:  AppTheme.rcColor.primary303133,
+                          fontSize: AppTheme.rcColor.fontSize20,
+                          fontWeight: FontWeight.w500
+                      ),),
+                  ),
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    child:GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: (){
+                        Navigator.of(context).pop();
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 12.0,vertical: 10.0),
+                        child: Text(
+                          '取消',
+                          style: TextStyle(
+                              color: AppTheme.rcColor.primary303133,
+                              fontSize: AppTheme.rcColor.fontSize16
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: 0,
+                    right: 0,
+                    child:GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: (){
+                        Navigator.of(context).pop({"带着地图参数返回"});
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 12.0,vertical: 10.0),
+                        child: Text(
+                          '确定',
+                          style: TextStyle(
+                              color: AppTheme.rcColor.primary00CCA9,
+                              fontSize: AppTheme.rcColor.fontSize16
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Expanded(
+            child: Column(
+              children: <Widget>[
+                Expanded(
+                  child: Container(
+                    alignment: Alignment.center,
+                    child: Text("地图"),
+                  ),
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppTheme.rcColor.primaryFFFFFF,
+                    borderRadius:BorderRadius.only(
+                      topLeft: Radius.circular(12),
+                      topRight: Radius.circular(12),
+                    ),
+                  ),
+                  width: double.maxFinite,
+                  height: 380,
+                  child: ListView.builder(
+                    padding: EdgeInsets.all(0),
+                    itemExtent: 60,
+                    itemBuilder:buildItem,
+                    itemCount: 30,
+                  ),
+                )
+              ],
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+
+  Widget buildItem(BuildContext context, int index){
+    final List<Map> _list = _dataList;
+    final Map data = {'title':'小康大道与红圆路交叉口$index','address' : '云南省昆明市五华区$index'};
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+          alignment: Alignment.centerLeft,
+          child: buildCheckItem(context,data,index == _selectIndex)
+      ),
+      onTap: () {
+        setState(() {
+          _selectIndex = index;
+        });
+      },
+    );
+  }
+
 }

@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 
+/// 搜索时获取搜索词高亮
+/// @param 
+/// @return
+/// @author 丁平
+/// created at 2020/6/15 20:51
+///
 class SearchUtils {
 
   /// 获取高亮关键字文本

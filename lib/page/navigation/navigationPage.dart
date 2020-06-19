@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:flutterbasics/config/config.dart';
 import 'package:flutterbasics/enum/enum.dart';
 import 'package:flutterbasics/page/widget/features/ConciseHeader.dart';
 import 'package:oktoast/oktoast.dart';
@@ -40,16 +39,6 @@ class _NavigationPage extends State<NavigationPage>{
                 _Container('百度导航',(){Goto(MapType.BAIDUMAP,'你怕是么有装百度导航``````');}),
                 _Container('苹果导航',(){Goto(MapType.APPLEMAP,'你怕是么有装苹果导航``````');}),
               ],
-            ),
-          ),
-          GestureDetector(
-            onTap: (){
-              widget.onTap("");
-            },
-            child: Container(
-              color: Colors.blue,
-              padding: EdgeInsets.all(20),
-              child: Text("点击"),
             ),
           ),
           Expanded(
