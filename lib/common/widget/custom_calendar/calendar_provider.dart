@@ -102,6 +102,8 @@ class CalendarProvider extends ChangeNotifier {
       });
     }
   }
+
+  ///计算整月数据
   Future<List<DateModel>> getItems(DateModel value) async {
     return compute(initCalendarForMonthView, {
       'year': value.year,
@@ -255,9 +257,12 @@ class CalendarProvider extends ChangeNotifier {
   void clearData() {
     print( "CalendarProvider clearData");
     CacheData.getInstance().clearData();
-    selectedDateList.clear();
+    selectedDateList?.clear();
     selectDateModel = null;
     calendarConfiguration = null;
-    dateTime.removeListener((){});
+    dateTime?.dispose();
+    generation?.dispose();
+    expandStatus?.dispose();
+    isNull?.dispose();
   }
 }

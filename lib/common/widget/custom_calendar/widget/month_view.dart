@@ -49,11 +49,13 @@ class _MonthViewState extends State<MonthView>
     calendarProvider = Provider.of<CalendarProvider>(context, listen: false);
     if (calendarProvider.calendarConfiguration.selectMode ==
         CalendarConstants.MODE_INTERVAL_SELECT) {
+      ///区间选择时需要监听数据
       widget.calendarController.addOnCalendarSelectListener((dateModel) {
         ///处理calendarProvider.selectedDateList里面数据乱序问题
         List<DateModel> _listDate = calendarProvider.selectedDateList.toList();
         _listDate.sort(
             (left, right) => left.getDateTime().compareTo(right.getDateTime()));
+        ///进行计算更改数据
         refreshDate(_listDate,dateModel);
       });
     }
@@ -75,11 +77,19 @@ class _MonthViewState extends State<MonthView>
     });
   }
 
+  ///
+  /// @param _listDate 选中数组
+  /// @param dateModel 当前月份数组[主要用作判断是监听方法还是回调方法]
+  /// @author 丁平
+  /// created at 2020/6/23 16:44
+  ///
   void refreshDate(List<DateModel> _listDate, [DateModel dateModel]) {
     DateModel _one = _listDate.first;
     DateModel _two = _listDate.last;
+    ///计算相差月份
     int _oneM = _one.getDateTime().customDifference(_two.getDateTime());
     for (int i = 0; i <= _oneM; i++) {
+      ///自动计算月份年份
       DateModel _firstDayOfMonth = DateModel.fromDateTime(DateTime(
           _one.year + (i > 12 ? 13 % 12 : 0),
           _one.month + (i > 12 ? i > 12 ? 13 % 12 : 0 : i),
@@ -101,11 +111,18 @@ class _MonthViewState extends State<MonthView>
   }
 
   ///处理区间选择逻辑
+  /// @param _one 月份第一天
+  /// @param _dateList 月份list数据
+  /// @param flag 判断是需要选中还是取消选中
+  /// @author 丁平
+  /// created at 2020/6/23 16:40
+  ///
   Future<List<DateModel>> setDateModel(
       DateModel _one, List<DateModel> _dateList,[bool flag = true]) async {
     DateModel _firstDayOfMonth =
         DateModel.fromDateTime(DateTime(_one.year, _one.month, 1));
     List<DateModel> _items = List();
+    ///如果没有数据时根据月份自动生成
     List<DateModel> _items_ =
         CacheData.getInstance().monthListCache[_firstDayOfMonth] ??
             await compute(initCalendarForMonthView, {
@@ -119,15 +136,16 @@ class _MonthViewState extends State<MonthView>
     _items_.forEach((item) {
       item.isSelected = flag ?
           item.getDateTime().compareTo(_dateList.first.getDateTime()) >= 0 &&
-              item.getDateTime().compareTo(_dateList.last.getDateTime()) <= 0 : false;
+              item.getDateTime().compareTo(_dateList.last.getDateTime()) <= 0 : false; ///判断是否在区间内
       item.isInterval = flag?
           item.getDateTime().compareTo(_dateList.first.getDateTime()) > 0 &&
-              item.getDateTime().compareTo(_dateList.last.getDateTime()) < 0 : false;
+              item.getDateTime().compareTo(_dateList.last.getDateTime()) < 0 : false;///判断是否在区间内进行更改颜色
       _items.add(item);
     });
     return _items;
   }
 
+  ///根据月份生成正月数据
   Future<List<DateModel>> getItems() async {
     return compute(initCalendarForMonthView, {
       'year': widget.year,
@@ -154,6 +172,8 @@ class _MonthViewState extends State<MonthView>
     configuration = calendarProvider.calendarConfiguration;
     DateModel _firstDayOfMonth =
         DateModel.fromDateTime(DateTime(widget.year, widget.month, 1));
+    ///添加ValueListenableBuilder,是为了更改后自动刷新数据
+    ///弊端 -  滑动太快会出现白屏
     return ValueListenableBuilder(
         valueListenable: calendarProvider.isNull,
         builder: (context, value, chile) {
