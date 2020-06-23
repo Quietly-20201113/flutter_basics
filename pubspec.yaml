@@ -17,8 +17,6 @@ dependencies:
   provider: ^4.0.3
   flutter_markdown : ^0.3.4
   flutter_easyrefresh : ^2.1.1
-  event_bus: ^1.1.1 #事件总线, 通常用于跨组件通信
-
 dev_dependencies:
   flutter_test:
     sdk: flutter

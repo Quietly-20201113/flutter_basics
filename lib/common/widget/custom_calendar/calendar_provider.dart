@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterbasics/common/widget/custom_calendar/constants/constants.dart';
 import 'package:flutterbasics/common/widget/custom_calendar/controller.dart';
@@ -24,6 +25,24 @@ class CalendarProvider extends ChangeNotifier {
   ValueNotifier<int> _generation =
   new ValueNotifier(0); //生成的int值，每次变化，都会刷新整个日历。
 
+  ///将日历放到ChangeNotifier中,区间选择时做数据更新
+  ///日历数据集合
+
+
+  ValueNotifier<bool> _isNull = new ValueNotifier(true);
+
+  ValueNotifier<bool> get isNull => _isNull;
+
+ set isNull(ValueNotifier<bool> _flag){
+   _isNull = _flag;
+   notifyListeners();
+ }
+
+  ///单月数据集合
+  void setMonthListCache(DateModel _key,List<DateModel> _value) async {
+    CacheData.getInstance().monthListCache[_key] = _value;
+  }
+
   ValueNotifier<int> get generation => _generation;
 
   set generation(ValueNotifier<int> value) {
@@ -35,8 +54,15 @@ class CalendarProvider extends ChangeNotifier {
   // ignore: unnecessary_getters_setters
   DateTime get lastMont => _lastMonth;
 
+
+  ValueNotifier<DateTime> dateTime = ValueNotifier<DateTime>(DateTime.now());
+
+
   set lastMont(DateTime value) {
     _lastMonth = value;
+    dateTime.value = value;
+//    isNull.value = true;
+    notifyListeners();
   }
   ///超出当前月是否不可点击
   bool get isExceedNotClick => _isExceedNotClick;
@@ -57,11 +83,45 @@ class CalendarProvider extends ChangeNotifier {
   DateModel get lastClickDateModel =>
       _lastClickDateModel; //保存最后点击的一个日期，用于周视图与月视图之间的切换和同步
 
+
+
+
   set lastClickDateModel(DateModel value) {
     _lastClickDateModel = value;
-    print("这里吗");
-    print("lastClickDateModel:$lastClickDateModel");
+    isNull.value = true;
+    if(CacheData.getInstance().monthListCache[DateModel.fromDateTime(DateTime(value.year, value.month, 1))] != null){
+//     dateModelList.value = CacheData.getInstance().monthListCache[DateModel.fromDateTime(DateTime(value.year, value.month, 1))];
+      isNull.value = false;
+    }else{
+      getItems(value).then((val){
+        CacheData.getInstance().monthListCache[DateModel.fromDateTime(DateTime(value.year, value.month, 1))] = val;
+//        dateModelList.value = val;
+        isNull.value = false;
+      }).catchError((err){
+        isNull.value = true;
+      });
+    }
   }
+  Future<List<DateModel>> getItems(DateModel value) async {
+    return compute(initCalendarForMonthView, {
+      'year': value.year,
+      'month': value.month,
+      'minSelectDate': calendarConfiguration.minSelectDate,
+      'maxSelectDate': calendarConfiguration.maxSelectDate,
+      'extraDataMap': calendarConfiguration.extraDataMap,
+      'offset': calendarConfiguration.offset
+    });
+  }
+
+  static Future<List<DateModel>> initCalendarForMonthView(Map map) async {
+    return DateUtil.initCalendarForMonthView(
+        map['year'], map['month'], DateTime.now(), DateTime.sunday,
+        minSelectDate: map['minSelectDate'],
+        maxSelectDate: map['maxSelectDate'],
+        extraDataMap: map['extraDataMap'],
+        offset: map['offset']);
+  }
+
 
   DateModel get selectDateModel => _selectDateModel;
 
@@ -198,5 +258,6 @@ class CalendarProvider extends ChangeNotifier {
     selectedDateList.clear();
     selectDateModel = null;
     calendarConfiguration = null;
+    dateTime.removeListener((){});
   }
 }

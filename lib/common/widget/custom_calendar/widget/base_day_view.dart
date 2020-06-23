@@ -70,3 +70,4 @@ abstract class BaseCombineDayWidget extends StatelessWidget {
 
   Widget getSelectedWidget(DateModel dateModel);
 }
+

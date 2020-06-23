@@ -40,14 +40,18 @@ class _BlueStylePageState extends State<IntervalSelectPage> {
 
     controller.addMonthChangeListener(
           (year, month) {
+            print("几次首页 = ${DateTime(year,month)}");
         text.value = "$month月";
         yearText.value = "$year年";
+            setState(() { });
       },
+
     );
 
     controller.addOnCalendarSelectListener((dateModel) {
       //刷新选择的时间
       selectText.value = "多选模式\n选中的时间:\n${controller.getMultiSelectCalendar().join("\n")}";
+       setState(() { });
     });
 
     text = new ValueNotifier("${DateTime.now().month}月");
@@ -68,7 +72,6 @@ class _BlueStylePageState extends State<IntervalSelectPage> {
         return CustomStyleDayWidget(dateModel);
       },
       calendarController: controller,
-      padding: EdgeInsets.symmetric(horizontal: 12.0),
       boxDecoration: BoxDecoration(
         color: AppTheme.rcColor.primaryFFFFFF,
       ),
@@ -206,7 +209,8 @@ class CustomStyleWeekBarItem extends BaseWeekBar {
 }
 
 class CustomStyleDayWidget extends BaseCombineDayWidget {
-  CustomStyleDayWidget(DateModel dateModel) : super(dateModel);
+  final CalendarController controller;
+  CustomStyleDayWidget(DateModel dateModel, {this.controller}) : super(dateModel);
 
   final TextStyle normalTextStyle =
   TextStyle(
@@ -251,23 +255,23 @@ class CustomStyleDayWidget extends BaseCombineDayWidget {
     return  dateModel.isCurrentMonth ?  Container(
       alignment: Alignment.center,
       decoration: new BoxDecoration(
-        shape: BoxShape.circle,
-        color: AppTheme.rcColor.primary00CCA9,
+//        shape: BoxShape.circle,
+        color: dateModel.isInterval??false ?  AppTheme.getOpacityColor(30, AppTheme.rcColor.primary00CCA9) : AppTheme.rcColor.primary00CCA9,
       ),
       child: Stack(
         alignment: Alignment.center,
         children: <Widget>[
-           Column(
+          Column(
             mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               //公历
-               Expanded(
+              Expanded(
                 child: Center(
                   child: Text(
                       dateModel.day.toString(),
                       style: TextStyle(
-                          color: AppTheme.rcColor.primaryFFFFFF,
+                          color: AppTheme.rcColor.primary606266,
                           fontSize: AppTheme.rcColor.fontSize18
                       )),
                 ),
@@ -278,4 +282,5 @@ class CustomStyleDayWidget extends BaseCombineDayWidget {
       ),
     ) : SizedBox();
   }
+
 }

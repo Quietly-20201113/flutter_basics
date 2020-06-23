@@ -25,7 +25,10 @@ class _MonthViewPagerState extends State<MonthViewPager>
     print( "MonthViewPager initState");
 //    获取到当前的CalendarProvider对象,设置listen为false，不需要刷新
     calendarProvider = Provider.of<CalendarProvider>(context, listen: false);
+    widget.calendarController.addMonthChangeListener((year, month) {
 
+//      setState(() {});
+    });
 //    //计算当前月视图的index
 //    DateModel dateModel = calendarProvider.lastClickDateModel;
 //    List<DateModel> monthList =
@@ -88,7 +91,7 @@ class _MonthViewPagerState extends State<MonthViewPager>
       controller: configuration.monthController,
       itemBuilder: (context, index) {
         final DateModel dateModel = configuration.monthList[index];
-        return new MonthView(
+        return  MonthView(
           configuration: configuration,
           year: dateModel.year,
           month: dateModel.month,

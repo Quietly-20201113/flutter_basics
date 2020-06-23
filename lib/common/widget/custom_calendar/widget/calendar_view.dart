@@ -174,10 +174,10 @@ class CalendarContainerState extends State<CalendarContainer>
         print("totalHeight:$totalHeight,newHeight:$newHeight");
         if (totalHeight.toInt() != newHeight.toInt()) {
           print("月份视图高度发生变化");
-          setState(() {
-            totalHeight = newHeight;
-          });
+          totalHeight = newHeight;
+
         }
+        setState(() {});
       }
     });
 
