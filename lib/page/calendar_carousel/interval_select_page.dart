@@ -47,18 +47,15 @@ class _BlueStylePageState extends State<IntervalSelectPage> {
       },
 
     );
-
     controller.addOnCalendarSelectListener((dateModel) {
       //刷新选择的时间
-      selectText.value = "多选模式\n选中的时间:\n${controller.getMultiSelectCalendar().join("\n")}";
-       setState(() { });
+      selectText.value =
+      "单选模式\n选中的时间:\n${controller.getMultiSelectCalendar()}";
     });
-
     text = new ValueNotifier("${DateTime.now().month}月");
     yearText = new ValueNotifier("${DateTime.now().year}年");
 
-    selectText = new ValueNotifier(
-        "多选模式\n选中的时间:\n${controller.getMultiSelectCalendar().join("\n")}");
+    selectText =  ValueNotifier("多选模式\n选中的时间:\n${controller.calendarProvider.selectedDateList..join("\n")}");
   }
 
   @override

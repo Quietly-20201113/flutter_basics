@@ -197,6 +197,10 @@ class CalendarController {
   void addOnCalendarSelectListener(OnCalendarSelect listener) {
     this.calendarConfiguration.calendarSelect = listener;
   }
+  //区间点击选择监听
+  void addIntervalOnCalendarSelectListener(OnCalendarSelect listener) {
+    this.calendarConfiguration.calendarSelectDoppelganger = listener;
+  }
 
   //多选超出指定范围
   void addOnMultiSelectOutOfRangeListener(OnMultiSelectOutOfRange listener) {

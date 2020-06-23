@@ -58,6 +58,7 @@ class CalendarConfiguration {
   //各种事件回调
   OnMonthChange monthChange; //月份切换事件 （已弃用,交给multiMonthChanges来实现）
   OnCalendarSelect calendarSelect; //点击选择事件
+  OnCalendarSelect calendarSelectDoppelganger; //区间点击选择事件
   OnMultiSelectOutOfRange multiSelectOutOfRange; //多选超出指定范围
   OnMultiSelectOutOfSize multiSelectOutOfSize; //多选超出限制个数
 

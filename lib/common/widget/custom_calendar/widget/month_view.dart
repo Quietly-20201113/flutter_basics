@@ -50,7 +50,7 @@ class _MonthViewState extends State<MonthView>
     if (calendarProvider.calendarConfiguration.selectMode ==
         CalendarConstants.MODE_INTERVAL_SELECT) {
       ///区间选择时需要监听数据
-      widget.calendarController.addOnCalendarSelectListener((dateModel) {
+      widget.calendarController.addIntervalOnCalendarSelectListener((dateModel) {
         ///处理calendarProvider.selectedDateList里面数据乱序问题
         List<DateModel> _listDate = calendarProvider.selectedDateList.toList();
         _listDate.sort(
@@ -348,6 +348,7 @@ class ItemContainerState extends State<ItemContainer> {
     calendarProvider.selectDateModel = dateModel;
     if (configuration.calendarSelect != null) {
       configuration.calendarSelect(dateModel);
+      configuration.calendarSelectDoppelganger(dateModel);
     }
 
     //单选需要刷新上一个item
@@ -375,6 +376,7 @@ class ItemContainerState extends State<ItemContainer> {
     }
     if (configuration.calendarSelect != null) {
       configuration.calendarSelect(dateModel);
+      configuration.calendarSelectDoppelganger(dateModel);
     }
 
     //多选也可以弄这些单选的代码
@@ -385,6 +387,7 @@ class ItemContainerState extends State<ItemContainer> {
   ///区间选择逻辑
   void _modelIntervalSelect() {
     if(calendarProvider.selectedDateList.length == 2){
+      assert(widget.onChange != null);
       widget.onChange(calendarProvider.selectedDateList.toList());
     }
     calendarProvider.selectDateModel = dateModel;
@@ -411,6 +414,7 @@ class ItemContainerState extends State<ItemContainer> {
       }
       if (configuration.calendarSelect != null) {
         configuration.calendarSelect(dateModel);
+        configuration.calendarSelectDoppelganger(dateModel);
       }
     }
     if (calendarProvider.lastClickItemState != this) {
