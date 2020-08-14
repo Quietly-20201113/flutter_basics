@@ -161,7 +161,7 @@ class CalendarController {
       int temp = -1;
       for (DateTime dateTime = firstWeekDate;
       !dateTime.isAfter(lastDay);
-      dateTime = dateTime.add(Duration(days: 7))) {
+      dateTime = dateTime?.add(Duration(days: 7))) {
         DateModel dateModel = DateModel.fromDateTime(dateTime);
         weekList.add(dateModel);
 //        print("nowTime.isBefore(dateTime)");
@@ -182,6 +182,9 @@ class CalendarController {
     calendarConfiguration.weekController = weekController;
   }
 
+
+
+
   //周视图切换
   void addWeekChangeListener(OnWeekChange listener){
     this.calendarConfiguration.weekChangeListeners.add(listener);
@@ -200,6 +203,11 @@ class CalendarController {
   //区间点击选择监听
   void addIntervalOnCalendarSelectListener(OnCalendarSelect listener) {
     this.calendarConfiguration.calendarSelectDoppelganger = listener;
+  }
+
+  ///日期选中清空监听
+  void addOnCalendarClear(OnCalendarClear listener){
+    this.calendarConfiguration.calendarClear = listener;
   }
 
   //多选超出指定范围
@@ -324,6 +332,12 @@ class CalendarController {
       }
     }
   }
+
+  //清空选中日期
+  void clearDateModel(){
+    calendarProvider.calendarConfiguration.calendarClear();
+  }
+
 
   //跳转到指定日期
   void moveToCalendar(int year, int month, int day,
@@ -552,6 +566,9 @@ typedef void OnMonthChange(int year, int month);
  * 日期选择事件
  */
 typedef void OnCalendarSelect(DateModel dateModel);
+
+///清空监听
+typedef void OnCalendarClear();
 
 /* *
  * 多选超出指定范围

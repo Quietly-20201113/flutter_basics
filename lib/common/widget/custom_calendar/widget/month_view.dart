@@ -53,12 +53,32 @@ class _MonthViewState extends State<MonthView>
       widget.calendarController.addIntervalOnCalendarSelectListener((dateModel) {
         ///处理calendarProvider.selectedDateList里面数据乱序问题
         List<DateModel> _listDate = calendarProvider.selectedDateList.toList();
-        _listDate.sort(
-            (left, right) => left.getDateTime().compareTo(right.getDateTime()));
-        ///进行计算更改数据
-        refreshDate(_listDate,dateModel);
+        if(_listDate.length == 2){
+          ///进行计算更改数据
+          refreshDate(_listDate,dateModel);
+        }
       });
     }
+
+    ///日期选中清空事件
+    widget.calendarController.addOnCalendarClear((){
+      switch (configuration.selectMode) {
+        case CalendarConstants.MODE_MULTI_SELECT:///单选
+
+          break;
+        case CalendarConstants.MODE_SINGLE_SELECT://多选
+
+          break;
+        case CalendarConstants.MODE_INTERVAL_SELECT://区间选
+            refreshDate(calendarProvider.selectedDateList.toList(),null,true);
+            calendarProvider.selectedDateList.clear();
+            configuration.calendarSelect(null);
+           CacheData.getInstance().clearData();
+          DateModel _firstDayOfMonth = DateModel.fromDateTime(calendarProvider.lastMont);
+          calendarProvider.lastClickDateModel = _firstDayOfMonth;
+          break;
+      }
+    });
 
     DateModel firstDayOfMonth =
         DateModel.fromDateTime(DateTime(widget.year, widget.month, 1));
@@ -83,7 +103,10 @@ class _MonthViewState extends State<MonthView>
   /// @author 丁平
   /// created at 2020/6/23 16:44
   ///
-  void refreshDate(List<DateModel> _listDate, [DateModel dateModel]) {
+  void refreshDate(List<DateModel> _listDate, [DateModel dateModel,bool isClear = false]) {
+    if(_listDate.length == 0) return;
+    _listDate.sort(
+            (left, right) => left.getDateTime().compareTo(right.getDateTime()));
     DateModel _one = _listDate.first;
     DateModel _two = _listDate.last;
     ///计算相差月份
@@ -99,15 +122,17 @@ class _MonthViewState extends State<MonthView>
                 DateTime(_firstDayOfMonth.year, _firstDayOfMonth.month, 1))] =
             _list;
 
-        ///判断是否是当前页,进行赋值刷新
+        ///判断是否是当前页,进行赋值刷新||清空
         if ( dateModel != null && _firstDayOfMonth
                 .getDateTime()
                 .customDifference(dateModel.getDateTime()) ==
-            0) {
+            0 || isClear) {
           setState(() {});
         }
       });
     }
+
+    print("日期 = ${widget.month}");
   }
 
   ///处理区间选择逻辑
@@ -265,9 +290,8 @@ class ItemContainerState extends State<ItemContainer> {
     isSelected = ValueNotifier(dateModel.isSelected);
     calendarProvider = Provider.of<CalendarProvider>(context, listen: false);
     configuration = calendarProvider.calendarConfiguration;
-
     ///单选处理默认选中(多选后期处理)
-    if (configuration.selectMode == CalendarConstants.MODE_SINGLE_SELECT) {
+    if (configuration.selectMode != CalendarConstants.MODE_MULTI_SELECT) {
       if (dateModel == calendarProvider.selectDateModel) {
         calendarProvider.lastClickItemState = this;
       }
@@ -348,7 +372,6 @@ class ItemContainerState extends State<ItemContainer> {
     calendarProvider.selectDateModel = dateModel;
     if (configuration.calendarSelect != null) {
       configuration.calendarSelect(dateModel);
-      configuration.calendarSelectDoppelganger(dateModel);
     }
 
     //单选需要刷新上一个item
@@ -376,7 +399,6 @@ class ItemContainerState extends State<ItemContainer> {
     }
     if (configuration.calendarSelect != null) {
       configuration.calendarSelect(dateModel);
-      configuration.calendarSelectDoppelganger(dateModel);
     }
 
     //多选也可以弄这些单选的代码
@@ -386,6 +408,8 @@ class ItemContainerState extends State<ItemContainer> {
 
   ///区间选择逻辑
   void _modelIntervalSelect() {
+    if (calendarProvider.isExceedNotClick &&
+        calendarProvider.lastMont.month != dateModel.month) return;
     if(calendarProvider.selectedDateList.length == 2){
       assert(widget.onChange != null);
       widget.onChange(calendarProvider.selectedDateList.toList());
@@ -412,12 +436,12 @@ class ItemContainerState extends State<ItemContainer> {
         }
         calendarProvider.selectedDateList.add(dateModel);
       }
-      if (configuration.calendarSelect != null) {
-        configuration.calendarSelect(dateModel);
-        configuration.calendarSelectDoppelganger(dateModel);
-      }
     }
-    if (calendarProvider.lastClickItemState != this) {
+    if (configuration.calendarSelect != null) {
+      configuration.calendarSelect(dateModel);
+      configuration.calendarSelectDoppelganger(dateModel);
+    }
+    if (calendarProvider.lastClickItemState != this || calendarProvider.lastClickItemState == null) {
       calendarProvider.lastClickItemState = this;
     }
     refreshItem(true);

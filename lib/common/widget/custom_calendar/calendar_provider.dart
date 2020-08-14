@@ -61,6 +61,7 @@ class CalendarProvider extends ChangeNotifier {
   set lastMont(DateTime value) {
     _lastMonth = value;
     dateTime.value = value;
+    print("时间 = ${_lastMonth.toString()}");
 //    isNull.value = true;
     notifyListeners();
   }

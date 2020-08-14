@@ -47,6 +47,15 @@ android {
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        ndk {
+            //选择要添加的对应cpu类型的.so库。
+            abiFilters 'armeabi', 'armeabi-v7a', 'mips', 'mips64', 'arm64-v8a', 'armeabi-v8a','x86','x86_64'
+            // 还可以添加
+        }
+        manifestPlaceholders = [
+                BAIDU_MAP_KEY : "0lYcFqIndGDeE2HjwuISE1inzDKPYEz7", /// 百度地图key
+        ]
+
     }
 //    signingConfigs {
 //        debug {
@@ -80,6 +89,13 @@ android {
             minifyEnabled true
             useProguard true
         }
+    }
+
+    packagingOptions{
+        pickFirst 'lib/armeabi-v7a/libapp.so'
+        pickFirst 'lib/armeabi/libapp.so'
+        pickFirst 'lib/arm64-v8a/libapp.so'
+        pickFirst 'lib/x86/libapp.so'
     }
 
 }

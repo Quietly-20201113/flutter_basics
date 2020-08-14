@@ -43,7 +43,6 @@ class _BlueStylePageState extends State<IntervalSelectPage> {
             print("几次首页 = ${DateTime(year,month)}");
         text.value = "$month月";
         yearText.value = "$year年";
-            setState(() { });
       },
 
     );
@@ -57,6 +56,8 @@ class _BlueStylePageState extends State<IntervalSelectPage> {
 
     selectText =  ValueNotifier("多选模式\n选中的时间:\n${controller.calendarProvider.selectedDateList..join("\n")}");
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -168,6 +169,16 @@ class _BlueStylePageState extends State<IntervalSelectPage> {
                   child: new Text(selectText.value),
                 );
               }),
+          Container(
+            color: AppTheme.rcColor.primary00CCA9,
+            padding: EdgeInsets.all(12),
+            child: RaisedButton(
+              onPressed: (){
+                controller.clearDateModel();
+              },
+              child: Text('清空所选'),
+            ),
+          )
         ],
       ),
     );

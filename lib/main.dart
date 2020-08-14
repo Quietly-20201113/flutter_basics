@@ -1,8 +1,11 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutterbasics/page/index.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:sentry/sentry.dart';
+import "package:flutter_bmfbase/BaiduMap/bmfmap_base.dart" show BMFMapSDK, BMF_COORD_TYPE;
+
 final SentryClient _sentry = new SentryClient(dsn: 'http://b1d8f0e6d2ae4ec188e125f05aecead0@172.16.1.241:9000/12');
 Future<Null> _reportError(dynamic error, dynamic stackTrace) async {
   print("异常收集 error = $error");
@@ -12,10 +15,13 @@ Future<Null> _reportError(dynamic error, dynamic stackTrace) async {
   );
 }
 Future<Null> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   FlutterError.onError = (FlutterErrorDetails details) async {
     Zone.current.handleUncaughtError(details.exception, details.stack);
   };
   runZoned<Future<void>>(() async {
+    if(Platform.isAndroid)
+      BMFMapSDK.setCoordType(BMF_COORD_TYPE.BD09LL);
     runApp(MyApp());
   }, onError: (error, stackTrace)  async {
     // Whenever an error occurs, call the `_reportError` function. This sends
